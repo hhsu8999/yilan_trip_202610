@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>宜蘭雙泉漫遊｜行程隨身手札</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            wood: {
+              50: '#FBF9F6',
+              100: '#F4ECE4',
+              200: '#E7D8C9',
+              500: '#A26F47',
+              600: '#8A5834',
+              700: '#6E4325',
+              800: '#4D2F19',
+              900: '#341E0F',
+            },
+            forest: {
+              50: '#F2F7F4',
+              100: '#E1ECE5',
+              200: '#C2D9CB',
+              500: '#3D7756',
+              600: '#2C5E41',
+              700: '#204630',
+              800: '#163122',
+            },
+            accent: {
+              orange: '#D96532',
+              cream: '#FDFBF7'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            serif: ['"Playfair Display"', '"Noto Sans TC"', 'serif'],
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(80, 50, 30, 0.06)',
+            'elevated': '0 10px 25px -4px rgba(80, 50, 30, 0.1)',
+            'float': '0 12px 30px -4px rgba(44, 94, 65, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* iOS 安全區域適配與平滑微調 */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* 卡片打勾完成時的過渡動畫 */
+    .card-transition {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+
+<body class="bg-wood-50 text-[#2B2724] font-sans antialiased min-h-screen pb-24 selection:bg-wood-200">
+
+  <!-- ================= TOP STICKY HEADER ================= -->
+  <header class="sticky top-0 z-30 bg-wood-50/90 backdrop-blur-md border-b border-wood-200/70 transition-all">
+    <div class="max-w-md mx-auto px-4 pt-3 pb-2.5">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="inline-block text-[10px] font-bold tracking-widest text-wood-600 uppercase bg-wood-100 px-2 py-0.5 rounded-full mb-0.5">
+            Yilan Relax Trip
+          </span>
+          <h1 class="text-lg font-extrabold text-[#231E19] flex items-center gap-1.5">
+            <span>宜蘭雙泉漫遊隨身手札</span>
+          </h1>
+        </div>
+        
+        <!-- 造訪進度圓餅 / 標籤 -->
+        <div class="flex items-center gap-2 bg-white/90 border border-wood-200 px-2.5 py-1.5 rounded-xl shadow-xs">
+          <div class="flex flex-col text-right">
+            <span class="text-[10px] text-gray-500 font-medium">造訪進度</span>
+            <span class="text-xs font-bold text-forest-600" id="progress-text">0 / 10 處</span>
+          </div>
+          <div class="relative w-7 h-7 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <path class="text-gray-200" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path id="progress-circle" class="text-forest-600 transition-all duration-500" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <span class="text-[9px] font-bold text-forest-700 absolute" id="progress-percent">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快速搜尋輸入框 -->
+      <div class="mt-2.5 relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="搜尋景點、肉羹、蔥油餅或地址..." 
+          class="w-full pl-9 pr-8 py-2 bg-white/95 border border-wood-200/90 rounded-xl text-xs font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all shadow-xs"
+        >
+        <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></button>
+      </div>
+
+      <!-- 橫向滑動分類 Tabs (吸頂好按) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pt-2.5 pb-0.5">
+        <button onclick="setTab('all')" data-tab="all" class="tab-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap bg-forest-700 text-white shadow-xs">
+          全部清單
+        </button>
+        <button onclick="setTab('spot')" data-tab="spot" class="tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white text-gray-600 border border-wood-200 hover:bg-wood-100">
+          🌲 核心景點
+        </button>
+        <button onclick="setTab('food')" data-tab="food" class="tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white text-gray-600 border border-wood-200 hover:bg-wood-100">
+          🍜 精選美食
+        </button>
+        <button onclick="setTab('backup')" data-tab="backup" class="tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white text-gray-600 border border-wood-200 hover:bg-wood-100">
+          ⭐ 老饕備選
+        </button>
+        <button onclick="setTab('checked')" data-tab="checked" class="tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white text-gray-600 border border-wood-200 hover:bg-wood-100">
+          ✅ 已打卡 (<span id="tab-checked-count">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT CONTAINER ================= -->
+  <main class="max-w-md mx-auto px-4 pt-3.5 space-y-4">
+
+    <!-- 1. 核心住宿地標：村却國際溫泉酒店 (Hero Card) -->
+    <section class="bg-gradient-to-br from-white via-wood-50 to-[#FDF4EB] border-2 border-wood-300/80 rounded-2xl p-4 shadow-elevated relative overflow-hidden">
+      <!-- 裝飾背景標籤 -->
+      <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-wood-200/30 rounded-full blur-xl pointer-events-none"></div>
+
+      <!-- 頂部身分識別 -->
+      <div class="flex items-center justify-between mb-2">
+        <span class="inline-flex items-center gap-1 bg-wood-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-md tracking-wide shadow-xs">
+          <span>👑</span> 兩天一夜住宿核心
+        </span>
+        <span class="text-[11px] font-semibold text-accent-orange bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md">
+          入住 14:00 ➔ 退房 11:00
+        </span>
+      </div>
+
+      <h2 class="text-xl font-bold text-gray-900 tracking-tight flex items-center justify-between">
+        <span>村却國際溫泉酒店</span>
+      </h2>
+      <p class="text-xs text-wood-700 font-medium mt-0.5">羅東頂級雙泉地標・房內坐擁專利奈米牛奶浴</p>
+
+      <!-- 核心設施亮點 Pills -->
+      <div class="grid grid-cols-3 gap-1.5 my-3">
+        <div class="bg-white/80 border border-wood-200 rounded-xl p-2 text-center">
+          <div class="text-base">♨️</div>
+          <div class="text-[10px] font-bold text-gray-800 mt-0.5">客房雙湯池</div>
+          <div class="text-[9px] text-gray-500 scale-95">碳酸氫鈉＋牛奶浴</div>
+        </div>
+        <div class="bg-white/80 border border-wood-200 rounded-xl p-2 text-center">
+          <div class="text-base">🍸</div>
+          <div class="text-[10px] font-bold text-gray-800 mt-0.5">The Roof 190</div>
+          <div class="text-[9px] text-gray-500 scale-95">360度百萬夜景</div>
+        </div>
+        <div class="bg-white/80 border border-wood-200 rounded-xl p-2 text-center">
+          <div class="text-base">🏊</div>
+          <div class="text-[10px] font-bold text-gray-800 mt-0.5">泳池水療館</div>
+          <div class="text-[9px] text-gray-500 scale-95">露天泳池與裸湯</div>
+        </div>
+      </div>
+
+      <!-- 地址與聯絡資訊 -->
+      <div class="text-xs text-gray-600 space-y-1 bg-white/60 rounded-xl p-2.5 border border-wood-100 mb-3">
+        <div class="flex items-start gap-1.5">
+          <span class="text-gray-400 mt-0.5">📍</span>
+          <span class="flex-1 font-medium text-gray-700">宜蘭縣羅東鎮站東路190號</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-gray-400">📞</span>
+          <span class="font-medium text-gray-700">03-905-7988</span>
+        </div>
+      </div>
+
+      <!-- 快捷操作大按鈕（單手友善） -->
+      <div class="grid grid-cols-3 gap-2">
+        <a 
+          href="tel:039057988" 
+          class="flex items-center justify-center gap-1.5 py-2.5 bg-white border border-wood-300 text-wood-700 rounded-xl font-bold text-xs active:scale-95 transition-all shadow-xs"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          一鍵撥號
+        </a>
+        <button 
+          onclick="copyAddress('宜蘭縣羅東鎮站東路190號', '村却國際溫泉酒店')" 
+          class="flex items-center justify-center gap-1.5 py-2.5 bg-white border border-wood-300 text-wood-700 rounded-xl font-bold text-xs active:scale-95 transition-all shadow-xs"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          複製地址
+        </button>
+        <a 
+          href="https://www.google.com/maps/search/?api=1&query=村却國際溫泉酒店+宜蘭縣羅東鎮站東路190號" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-1.5 py-2.5 bg-forest-700 text-white rounded-xl font-bold text-xs active:scale-95 transition-all shadow-xs"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          立即導航
+        </a>
+      </div>
+    </section>
+
+    <!-- 2. 羅東林場精華生活圈提示 (Highlight Banner) -->
+    <section class="bg-gradient-to-r from-forest-800 to-forest-700 text-white rounded-2xl p-3.5 shadow-md border border-forest-600 relative overflow-hidden">
+      <div class="flex items-start gap-2.5">
+        <div class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-sm shrink-0 mt-0.5">
+          💡
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h3 class="text-xs font-bold tracking-wide text-green-200 uppercase">聰明省時秘訣</h3>
+            <span class="bg-white/20 text-[10px] px-1.5 py-0.2 rounded font-semibold text-white">中正北路一條龍</span>
+          </div>
+          <p class="text-xs leading-relaxed text-emerald-50 mt-1 font-medium">
+            <strong class="text-yellow-300">木育森林、羅東林場、曾氏炸蛋蔥油餅、林場肉羹、北門綠豆沙</strong> 全在中正北路 200 公尺生活圈內！車停林場停車場，步行 2~3 分鐘即可一網打盡。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 卡片動態清單容器 -->
+    <div id="cards-container" class="space-y-3">
+      <!-- JavaScript 會根據篩選與搜尋動態渲染卡片 -->
+    </div>
+
+    <!-- 無搜尋結果提示 -->
+    <div id="empty-state" class="hidden text-center py-12 px-4 bg-white rounded-2xl border border-wood-200">
+      <div class="text-3xl mb-2">🔍</div>
+      <p class="text-sm font-bold text-gray-700">找不到符合條件的地點</p>
+      <p class="text-xs text-gray-400 mt-1">請嘗試縮短關鍵字或切換上方的分類標籤</p>
+      <button onclick="resetSearchAndFilter()" class="mt-3 px-4 py-1.5 bg-wood-100 text-wood-700 rounded-lg text-xs font-bold hover:bg-wood-200">
+        重置條件
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ================= FLOATING TOAST NOTIFICATION ================= -->
+  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/90 text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-float backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+    <span id="toast-icon">📋</span>
+    <span id="toast-msg">已成功複製地址</span>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // 景點與美食完整資料集 (依需求排列)
+    const ITEMS = [
+      {
+        id: 'spot-1',
+        name: '星夢森林劇場',
+        category: 'spot',
+        categoryName: '核心景點',
+        tag: '萌寵親近・日系農場',
+        desc: '超人氣零距離農場！親手餵食水豚、羊駝、象龜、侏儒山羊與梅花鹿。園區環境整潔無異味，動線平坦好走。',
+        time: '09:00 - 17:00 (最後入園 16:30)',
+        closed: '全年無休 (遇颱風特殊天候除外)',
+        phone: '0966-417-997',
+        phoneRaw: '0966417997',
+        address: '宜蘭縣冬山鄉柯林村境安二路323號',
+        mapQuery: '星夢森林劇場 宜蘭縣冬山鄉柯林村境安二路323號',
+        tip: '門票附牧草，建議早晨或傍晚微風時段前往最舒適'
+      },
+      {
+        id: 'spot-2',
+        name: '木育森林（羅東林場店）',
+        category: 'spot',
+        categoryName: '核心景點',
+        tag: '室內原木樂園・免門票',
+        desc: '位在羅東林場森活館內！全室內原木益智機關玩具、動態重力球與木藝文創，趣味解壓且完全不受下雨影響。',
+        time: '09:00 - 17:00',
+        closed: '配合園區館舍調整 (無固定公休)',
+        phone: '03-953-3957',
+        phoneRaw: '039533957',
+        address: '宜蘭縣羅東鎮中正北路118號 (林場森活館內)',
+        mapQuery: '木育森林 羅東林場店 宜蘭縣羅東鎮中正北路118號',
+        tip: '林場園區內步行即達，免門票，非常適合作為午後悠閒據點'
+      },
+      {
+        id: 'spot-3',
+        name: '羅東林業文化園區（羅東林場）',
+        category: 'spot',
+        categoryName: '核心景點',
+        tag: '日式鐵道・貯木池生態',
+        desc: '百年太平山伐木集散地，保存退役老蒸汽火車頭、森林鐵軌、日式木造官舍與超大貯木水塘，綠樹成蔭漫步極美。',
+        time: '園區 06:00 - 19:00 (展示館 09:00-17:00)',
+        closed: '戶外園區全年開放',
+        phone: '03-954-5114',
+        phoneRaw: '039545114',
+        address: '宜蘭縣羅東鎮中正北路118號',
+        mapQuery: '羅東林業文化園區 宜蘭縣羅東鎮中正北路118號',
+        tip: '設有收費停車場，散步完可直接走到對面吃肉羹與蔥油餅'
+      },
+      {
+        id: 'food-1',
+        name: '五結三星蔥（曾氏）炸蛋蔥油餅',
+        category: 'food',
+        categoryName: '精選美食',
+        tag: '爆汁半熟蛋・香脆金黃',
+        desc: '現桿餅皮入鍋高溫半煎炸，外酥內Q！大把豪邁撒入當日新鮮現切三星蔥，搭配流心半熟炸蛋與特製蒜辣醬，一咬噴香。',
+        time: '10:00 - 18:30 (售完提早打烊)',
+        closed: '不定休 (出發前建議致電)',
+        phone: '0989-138-088',
+        phoneRaw: '0989138088',
+        address: '宜蘭縣羅東鎮中正北路118號對面 (林場正對面)',
+        mapQuery: '林場三星蔥曾氏炸蛋蔥油餅 羅東鎮中正北路118號對面',
+        tip: '熱騰騰現吃最享受，買完可順便買杯北門綠豆沙搭配解膩'
+      },
+      {
+        id: 'food-2',
+        name: '羅東林場肉羹',
+        category: 'food',
+        categoryName: '精選美食',
+        tag: '50年老字號・純肉真材實料',
+        desc: '林場對面飄香半世紀的代表名店。嚴選厚切豬胛心肉裹薄漿，肉質紮實彈牙，古早味琥珀勾芡湯頭鮮甜順口。',
+        time: '07:00 - 17:30',
+        closed: '每週三固定公休',
+        phone: '03-955-2736',
+        phoneRaw: '039552736',
+        address: '宜蘭縣羅東鎮中正北路109號',
+        mapQuery: '林場肉羹 宜蘭縣羅東鎮中正北路109號',
+        tip: '內用直接找座位點餐，翻桌率極快，淋上一匙烏醋風味更上層樓'
+      },
+      {
+        id: 'food-3',
+        name: '北門綠豆沙牛乳大王（羅東店）',
+        category: 'food',
+        categoryName: '精選美食',
+        tag: '冰淇淋般綿密・排隊名飲',
+        desc: '宜蘭傳奇綠豆沙羅東直營店！經繁複工序細磨，口感如絲絨雪泥般無冰晶顆粒，融入鮮乳濃香順口，消暑解膩首選。',
+        time: '10:00 - 17:00 (售完為止)',
+        closed: '每週一、週二固定公休',
+        phone: '03-957-1722',
+        phoneRaw: '039571722',
+        address: '宜蘭縣羅東鎮中正北路179號',
+        mapQuery: '北門綠豆沙牛乳大王羅東店 宜蘭縣羅東鎮中正北路179號',
+        tip: '中正北路上步行可達，招牌為綠豆沙牛乳及芋頭沙牛乳'
+      },
+      {
+        id: 'backup-1',
+        name: '阿娘給的蒜味肉羹',
+        category: 'backup',
+        categoryName: '老饕備選',
+        tag: '大蒜狂熱・北門肉羹老始祖',
+        desc: '原北門蒜味肉羹創始人掌廚老店！重磅大蒜碎熬煮湯頭，蒜味深邃濃嗆超夠味，手作肉條大塊滿足。',
+        time: '09:00 - 18:00 (賣完為止)',
+        closed: '每週日、週一固定公休',
+        phone: '03-932-4293',
+        phoneRaw: '039324293',
+        address: '宜蘭市泰山路239-1號',
+        mapQuery: '阿娘給的蒜味肉羹 宜蘭市泰山路239-1號',
+        tip: '抵達先抽號碼牌！肉羹可搭油麵、米粉或粿仔條'
+      },
+      {
+        id: 'backup-2',
+        name: '羅東肉焿番（國宴肉捲）',
+        category: 'backup',
+        categoryName: '老饕備選',
+        tag: '三代名店・總統國宴指定小吃',
+        desc: '嚴選新鮮豬後腿肉包入薄豆皮現炸，外皮酥脆卡滋、內餡洋蔥與肉香四溢，是羅東指標性古早味。',
+        time: '09:00 - 16:00',
+        closed: '不定休 (建議出發前電話確認)',
+        phone: '03-954-0262',
+        phoneRaw: '039540262',
+        address: '宜蘭縣羅東鎮民權路185-1號',
+        mapQuery: '羅東肉焿番 宜蘭縣羅東鎮民權路185-1號',
+        tip: '招牌肉捲必點！羹湯偏傳統宜蘭清甜風味'
+      },
+      {
+        id: 'backup-3',
+        name: '正常鮮肉小籠湯包（羅東店）',
+        category: 'backup',
+        categoryName: '老饕備選',
+        tag: '現擀現包・爆汁鮮甜蔥肉餡',
+        desc: '超人氣排隊名店！麵皮擀得極其透薄，熱氣騰騰蒸起，輕輕咬破小洞便流出滿匙鮮甜的三星蔥豬肉高湯。',
+        time: '06:10 - 13:30 (早午餐限定)',
+        closed: '每週一固定公休',
+        phone: '03-954-5309',
+        phoneRaw: '039545309',
+        address: '宜蘭縣羅東鎮南門路7號',
+        mapQuery: '正常鮮肉小籠湯包 羅東店 宜蘭縣羅東鎮南門路7號',
+        tip: '營業時間只到中午，適合退房後作為豐富早午餐'
+      },
+      {
+        id: 'backup-4',
+        name: '財記港式臭豆腐',
+        category: 'backup',
+        categoryName: '老饕備選',
+        tag: '全台獨門・起司堡臭豆腐',
+        desc: '羅東火車站周邊超夯排隊名攤！招牌限量「起司堡臭豆腐」，起酥皮內裹吸飽肉汁的嫩豆腐，脆皮臭豆腐亦炸得外脆內嫩。',
+        time: '14:00 - 22:00 (售完提早打烊)',
+        closed: '每週二固定公休',
+        phone: '03-956-6220',
+        phoneRaw: '039566220',
+        address: '宜蘭縣羅東鎮公正路110號',
+        mapQuery: '財記港式臭豆腐 宜蘭縣羅東鎮公正路110號',
+        tip: '起司堡每日限量秒殺，想吃建議下午 14:00 剛開門即前往點單'
+      }
+    ];
+
+    // 狀態管理
+    let currentTab = 'all';
+    let searchQuery = '';
+    const STORAGE_KEY = 'yilan_travel_checked_spots_v1';
+    let checkedItems = new Set();
+
+    // 初始化 LocalStorage 讀取
+    function initStorage() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          checkedItems = new Set(JSON.parse(saved));
+        }
+      } catch (e) {
+        console.error('LocalStorage load failed', e);
+      }
+      updateStats();
+    }
+
+    // 儲存狀態
+    function saveStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...checkedItems]));
+      } catch (e) {
+        console.error('LocalStorage save failed', e);
+      }
+      updateStats();
+    }
+
+    // 更新進度與統計數字
+    function updateStats() {
+      const total = ITEMS.length;
+      const count = checkedItems.size;
+      const pct = Math.round((count / total) * 100);
+
+      document.getElementById('progress-text').innerText = `${count} / ${total} 處`;
+      document.getElementById('progress-percent').innerText = `${pct}%`;
+      document.getElementById('tab-checked-count').innerText = count;
+
+      // 圓餅進度條
+      const circle = document.getElementById('progress-circle');
+      if (circle) {
+        circle.setAttribute('stroke-dasharray', `${pct}, 100`);
+      }
+    }
+
+    // 切換打卡狀態
+    function toggleCheck(id) {
+      if (checkedItems.has(id)) {
+        checkedItems.delete(id);
+        showToast('已取消造訪打卡', '↩️');
+      } else {
+        checkedItems.add(id);
+        showToast('太棒了！已標記為造訪地點', '🎉');
+      }
+      saveStorage();
+      renderCards();
+    }
+
+    // 切換分類 Tab
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-tab') === tab;
+        if (isActive) {
+          btn.className = 'tab-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap bg-forest-700 text-white shadow-xs';
+        } else {
+          btn.className = 'tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap bg-white text-gray-600 border border-wood-200 hover:bg-wood-100';
+        }
+      });
+      renderCards();
+    }
+
+    // 複製地址 (iframe 友善容錯版)
+    function copyAddress(address, name) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = address;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          showToast(`已複製「${name}」地址！`, '📋');
+        } else {
+          showToast('複製失敗，請手動複製', '⚠️');
+        }
+      } catch (err) {
+        showToast('複製地址失敗', '⚠️');
+      }
+    }
+
+    // Toast 提示框
+    let toastTimer = null;
+    function showToast(msg, icon = '📋') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+      toastIcon.innerText = icon;
+
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2200);
+    }
+
+    // 渲染卡片邏輯
+    function renderCards() {
+      const container = document.getElementById('cards-container');
+      const emptyState = document.getElementById('empty-state');
+
+      // 篩選項目
+      const filtered = ITEMS.filter(item => {
+        // Tab 篩選
+        if (currentTab === 'spot' && item.category !== 'spot') return false;
+        if (currentTab === 'food' && item.category !== 'food') return false;
+        if (currentTab === 'backup' && item.category !== 'backup') return false;
+        if (currentTab === 'checked' && !checkedItems.has(item.id)) return false;
+
+        // 搜尋篩選
+        if (searchQuery.trim() !== '') {
+          const q = searchQuery.toLowerCase();
+          const matchName = item.name.toLowerCase().includes(q);
+          const matchDesc = item.desc.toLowerCase().includes(q);
+          const matchAddr = item.address.toLowerCase().includes(q);
+          const matchTag = item.tag.toLowerCase().includes(q);
+          if (!matchName && !matchDesc && !matchAddr && !matchTag) return false;
+        }
+
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = filtered.map(item => {
+        const isChecked = checkedItems.has(item.id);
+        
+        // 標籤樣式
+        let categoryBadge = '';
+        if (item.category === 'spot') {
+          categoryBadge = '<span class="text-[10px] font-bold text-forest-700 bg-forest-100 border border-forest-200 px-2 py-0.5 rounded-md">🌲 核心景點</span>';
+        } else if (item.category === 'food') {
+          categoryBadge = '<span class="text-[10px] font-bold text-wood-700 bg-wood-100 border border-wood-200 px-2 py-0.5 rounded-md">🍜 精選美食</span>';
+        } else {
+          categoryBadge = '<span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">⭐ 老饕備選</span>';
+        }
+
+        // 公休提示色彩
+        const isHolidayAlert = item.closed.includes('週');
+        const closedBadge = isHolidayAlert
+          ? `<span class="text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded">公休：${item.closed}</span>`
+          : `<span class="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">${item.closed}</span>`;
+
+        return `
+          <article class="card-transition bg-white border ${isChecked ? 'border-forest-200 bg-emerald-50/20' : 'border-wood-200'} rounded-2xl p-4 shadow-soft">
+            
+            <!-- 卡片頂部：打勾狀態與名稱 -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                  ${categoryBadge}
+                  <span class="text-[10px] font-medium text-gray-600 bg-wood-50 border border-wood-100 px-2 py-0.5 rounded-md">
+                    ${item.tag}
+                  </span>
+                </div>
+                <h3 class="text-base font-bold text-gray-900 tracking-tight flex items-center gap-1.5 ${isChecked ? 'line-through text-gray-400' : ''}">
+                  ${item.name}
+                </h3>
+              </div>
+
+              <!-- 打勾 Checkbox (大觸控熱區) -->
+              <button 
+                onclick="toggleCheck('${item.id}')" 
+                class="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isChecked ? 'bg-forest-600 text-white shadow-xs' : 'bg-gray-100 text-gray-300 hover:bg-gray-200'}"
+                aria-label="打卡標記"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- 簡述說明 -->
+            <p class="text-xs leading-relaxed text-gray-600 mt-2 font-normal ${isChecked ? 'opacity-70' : ''}">
+              ${item.desc}
+            </p>
+
+            <!-- 實用貼士 Tip -->
+            <div class="mt-2.5 flex items-start gap-1.5 bg-wood-50/80 border border-wood-100/90 rounded-xl p-2 text-[11px] text-wood-800">
+              <span class="shrink-0 text-wood-500 font-bold">💡 貼士：</span>
+              <span class="leading-snug">${item.tip}</span>
+            </div>
+
+            <!-- 營業時間與公休日 -->
+            <div class="mt-2.5 pt-2 border-t border-dashed border-gray-100 text-xs text-gray-600 space-y-1">
+              <div class="flex items-center justify-between flex-wrap gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-gray-400">🕒</span>
+                  <span class="font-medium text-gray-800">${item.time}</span>
+                </div>
+                ${closedBadge}
+              </div>
+
+              <div class="flex items-start gap-1.5 pt-0.5">
+                <span class="text-gray-400 mt-0.5">📍</span>
+                <span class="font-medium text-gray-700 flex-1 leading-tight">${item.address}</span>
+              </div>
+            </div>
+
+            <!-- 卡片操作按鈕列 (電話直撥、複製地址、Google Maps 導航) -->
+            <div class="grid grid-cols-3 gap-2 mt-3 pt-2">
+              <a 
+                href="tel:${item.phoneRaw}" 
+                class="flex items-center justify-center gap-1 py-2 bg-white border border-wood-200 text-gray-700 rounded-xl font-semibold text-xs active:bg-wood-100 transition-all shadow-2xs"
+              >
+                <svg class="w-3.5 h-3.5 text-wood-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                通話
+              </a>
+
+              <button 
+                onclick="copyAddress('${item.address}', '${item.name}')" 
+                class="flex items-center justify-center gap-1 py-2 bg-white border border-wood-200 text-gray-700 rounded-xl font-semibold text-xs active:bg-wood-100 transition-all shadow-2xs"
+              >
+                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                複製
+              </button>
+
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="flex items-center justify-center gap-1 py-2 bg-forest-600 text-white rounded-xl font-bold text-xs active:bg-forest-700 transition-all shadow-2xs"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                導航
+              </a>
+            </div>
+
+          </article>
+        `;
+      }).join('');
+    }
+
+    // 重置搜尋與篩選
+    function resetSearchAndFilter() {
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+      searchInput.value = '';
+      searchQuery = '';
+      clearBtn.classList.add('hidden');
+      setTab('all');
+    }
+
+    // 搜尋監聽
+    document.addEventListener('DOMContentLoaded', () => {
+      initStorage();
+
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        if (searchQuery.trim().length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+        renderCards();
+      });
+
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchQuery = '';
+        clearBtn.classList.add('hidden');
+        renderCards();
+      });
+
+      renderCards();
+    });
+  </script>
+</body>
+</html>
